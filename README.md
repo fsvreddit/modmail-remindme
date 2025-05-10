@@ -2,13 +2,13 @@ This app, inspired by RemindMeBot, allows you to set reminders in Modmail using 
 
 ## Setting reminders
 
-Use the command `RemindMe!`, `!remind` or `!remindme`, with the period specified e.g.
+In modmail, use the command `RemindMe!`, `!remind` or `!remindme`, with the period specified e.g.
 
 * `RemindMe! 1 day`
 * `RemindMe! 2 weeks`
 * `RemindMe! 6 months`
 
-Intervals supported are `minute`, `day`, `week`, `month` and `year`.
+Intervals supported are `minute`, `day`, `week`, `month` and `year`. If you don't specify an interval, then the app assumes days.
 
 If an existing reminder for the modmail thread already exists, it will be replaced with the new one.
 
