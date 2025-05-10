@@ -12,9 +12,19 @@ Intervals supported are `minute`, `day`, `week`, `month` and `year`. If you don'
 
 If an existing reminder for the modmail thread already exists, it will be replaced with the new one.
 
+You can put additional text in the modmail message that contains the command too, if you want to put a note in about *why* you are setting the reminder.
+
+If more than one command is found in the message, only the first one will be processed.
+
 ## Cancelling reminders
 
 Use the same command with "cancel" after e.g. `RemindMe! cancel`.
+
+## Change History
+
+### v1.0
+
+Initial release
 
 ## About this app
 
