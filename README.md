@@ -8,7 +8,7 @@ In modmail, use the command `RemindMe!`, `!remind` or `!remindme`, with the peri
 * `RemindMe! 2 weeks`
 * `RemindMe! 6 months`
 
-Intervals supported are `minute`, `day`, `week`, `month` and `year`. If you don't specify an interval, then the app assumes days.
+Intervals supported are `minute`, `hour`, `day`, `week`, `month` and `year`. If you don't specify an interval, then the app assumes days.
 
 If an existing reminder for the modmail thread already exists, it will be replaced with the new one.
 
