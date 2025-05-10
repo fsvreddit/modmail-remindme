@@ -37,7 +37,11 @@ export async function queueAdhocTask (context: TriggerContext) {
         return;
     }
 
-    const nextReminderDue = new Date(reminderQueue[0].score);
+    let nextReminderDue = new Date(reminderQueue[0].score);
+    if (nextReminderDue.getTime() < new Date().getTime()) {
+        nextReminderDue = new Date();
+    }
+
     const cron = await context.redis.get(SEND_REMINDER_CRON_KEY);
     if (!cron) {
         console.error("Queue Adhoc Job: No cron found");
