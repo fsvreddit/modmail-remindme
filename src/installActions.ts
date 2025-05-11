@@ -19,5 +19,5 @@ export async function handleInstallActions (_: AppInstall | AppUpgrade, context:
 
     await queueAdhocTask(context);
 
-    console.log("Install Actions: A new version of the app has been installed or upgraded. All jobs have been reset.");
+    console.log("Install Actions: A new version of the app has been installed or upgraded.");
 }
