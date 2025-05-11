@@ -3,10 +3,10 @@ import { ModMail } from "@devvit/protos";
 import { parseCancellation, parseCommandDate } from "./commandParser.js";
 import { cancelReminder, getConversationReminderDate, queueReminder } from "./sendReminders.js";
 import json2md from "json2md";
-import { format } from "date-fns";
+import { DateTime } from "luxon";
 
-export function formatDate (date: Date) {
-    return format(date, "EEEE, MMM d, yyyy 'at' HH:mm 'UTC'");
+export function formatDate (date: DateTime) {
+    return date.toFormat("EEEE, MMM d, yyyy 'at' HH:mm 'UTC'");
 }
 
 export async function handleModmail (event: ModMail, context: TriggerContext) {

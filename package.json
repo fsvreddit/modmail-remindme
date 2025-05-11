@@ -12,10 +12,11 @@
     "@devvit/protos": "0.11.15",
     "@devvit/public-api": "0.11.15",
     "@types/json2md": "^1.5.4",
+    "@types/luxon": "^3.6.2",
     "@types/pluralize": "^0.0.33",
     "cron-parser": "^5.1.1",
-    "date-fns": "^4.1.0",
     "json2md": "^2.0.3",
+    "luxon": "^3.6.1",
     "pluralize": "^8.0.0"
   },
   "devDependencies": {

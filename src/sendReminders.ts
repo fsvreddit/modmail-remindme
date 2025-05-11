@@ -1,15 +1,15 @@
 import { JobContext, TriggerContext } from "@devvit/public-api";
 import { CronExpressionParser } from "cron-parser";
 import { SEND_REMINDER_CRON_KEY, SEND_REMINDER_JOB } from "./constants.js";
-import { addSeconds, subSeconds } from "date-fns";
+import { DateTime } from "luxon";
 import pluralize from "pluralize";
 import json2md from "json2md";
 
 const REMINDER_QUEUE = "reminderQueue";
 const REMINDER_USERNAMES = "reminderUsernames";
 
-export async function queueReminder (conversationId: string, username: string | undefined, reminderDate: Date, context: TriggerContext) {
-    await context.redis.zAdd(REMINDER_QUEUE, { member: conversationId, score: reminderDate.getTime() });
+export async function queueReminder (conversationId: string, username: string | undefined, reminderDate: DateTime, context: TriggerContext) {
+    await context.redis.zAdd(REMINDER_QUEUE, { member: conversationId, score: reminderDate.toMillis() });
     if (username) {
         await context.redis.hSet(REMINDER_USERNAMES, { [conversationId]: username });
     }
@@ -23,10 +23,10 @@ export async function cancelReminder (conversationId: string, context: TriggerCo
     return recordsRemoved > 0;
 }
 
-export async function getConversationReminderDate (conversationId: string, context: TriggerContext): Promise<Date | undefined> {
+export async function getConversationReminderDate (conversationId: string, context: TriggerContext): Promise<DateTime | undefined> {
     const score = await context.redis.zScore(REMINDER_QUEUE, conversationId);
     if (score) {
-        return new Date(score);
+        return DateTime.fromMillis(score);
     }
 }
 
@@ -49,7 +49,7 @@ export async function queueAdhocTask (context: TriggerContext) {
     }
     const nextScheduledJob = CronExpressionParser.parse(cron).next().toDate();
 
-    if (nextReminderDue > subSeconds(nextScheduledJob, 30)) {
+    if (nextReminderDue > DateTime.fromJSDate(nextScheduledJob).minus({ seconds: 30 }).toJSDate()) {
         console.log(`Queue Adhoc Job: Next scheduled run (${nextScheduledJob.toISOString()}) is due too soon before the next reminder (${nextReminderDue.toISOString()})`);
         return;
     }
@@ -62,7 +62,7 @@ export async function queueAdhocTask (context: TriggerContext) {
 
     await context.scheduler.runJob({
         name: SEND_REMINDER_JOB,
-        runAt: addSeconds(nextReminderDue, 5),
+        runAt: DateTime.fromJSDate(nextReminderDue).plus({ seconds: 5 }).toJSDate(),
         data: { type: "adhoc" },
     });
 

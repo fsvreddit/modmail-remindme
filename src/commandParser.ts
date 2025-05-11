@@ -1,11 +1,11 @@
-import { addDays, addHours, addMinutes, addMonths, addWeeks, addYears } from "date-fns";
+import { DateTime, DurationLike } from "luxon";
 
 export function parseCancellation (message: string): boolean {
     const cancelRegex = /(?:!remind(?:me)?|RemindMe!) cancel/i;
     return cancelRegex.test(message);
 }
 
-export function parseCommandDate (message: string, baseline?: Date): Date | undefined {
+export function parseCommandDate (message: string, baseline?: Date): DateTime | undefined {
     const commandRegex = /(?:!remind(?:me)?|RemindMe!) (\d+)(?: )?(minute|hour|day|week|month|year)?s?/i;
     const matches = commandRegex.exec(message);
     if (!matches) {
@@ -16,21 +16,14 @@ export function parseCommandDate (message: string, baseline?: Date): Date | unde
     const timeUnit = matches[2] ? matches[2].toLowerCase() : "day";
 
     baseline ??= new Date();
+    const duration: DurationLike = {
+        minutes: timeUnit === "minute" ? timeValue : undefined,
+        hours: timeUnit === "hour" ? timeValue : undefined,
+        days: timeUnit === "day" ? timeValue : undefined,
+        weeks: timeUnit === "week" ? timeValue : undefined,
+        months: timeUnit === "month" ? timeValue : undefined,
+        years: timeUnit === "year" ? timeValue : undefined,
+    };
 
-    switch (timeUnit) {
-        case "minute":
-            return addMinutes(baseline, timeValue);
-        case "hour":
-            return addHours(baseline, timeValue);
-        case "day":
-            return addDays(baseline, timeValue);
-        case "week":
-            return addWeeks(baseline, timeValue);
-        case "month":
-            return addMonths(baseline, timeValue);
-        case "year":
-            return addYears(baseline, timeValue);
-        default:
-            return;
-    }
+    return DateTime.fromJSDate(baseline).plus(duration);
 }

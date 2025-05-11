@@ -21,20 +21,20 @@ test("parseCancellation", () => {
 
 test("parseCommandDate", () => {
     const testCases = [
-        { input: "!remindme 5 minutes", expected: "2023-10-01T12:05:00.000Z" },
-        { input: "!RemindMe 2 hours", expected: "2023-10-01T14:00:00.000Z" },
-        { input: "!remind 1 day", expected: "2023-10-02T12:00:00.000Z" },
-        { input: "!Remind 3 weeks", expected: "2023-10-22T12:00:00.000Z" },
-        { input: "!remindme 4 months", expected: "2024-02-01T13:00:00.000Z" },
-        { input: "!RemindMe 1 year", expected: "2024-10-01T12:00:00.000Z" },
-        { input: "!remindme 5 days", expected: "2023-10-06T12:00:00.000Z" },
+        { input: "!remindme 5 minutes", expected: "2023-10-01T12:05:00.000" },
+        { input: "!RemindMe 2 hours", expected: "2023-10-01T14:00:00.000" },
+        { input: "!remind 1 day", expected: "2023-10-02T12:00:00.000" },
+        { input: "!Remind 3 weeks", expected: "2023-10-22T12:00:00.000" },
+        { input: "!remindme 4 months", expected: "2024-02-01T13:00:00.000" },
+        { input: "!RemindMe 1 year", expected: "2024-10-01T12:00:00.000" },
+        { input: "!remindme 5 days", expected: "2023-10-06T12:00:00.000" },
     ];
 
     const baselineDate = new Date("2023-10-01T12:00:00.000Z");
 
     testCases.forEach(({ input, expected }) => {
         const result = parseCommandDate(input, baselineDate);
-        expect(result?.toISOString()).toBe(expected);
+        expect(result?.setZone("UTC").toISO({ includeOffset: false })).toBe(expected);
     });
 });
 
