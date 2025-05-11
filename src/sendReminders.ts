@@ -77,11 +77,11 @@ export async function sendReminders (_: unknown, context: JobContext) {
         const conversationId = reminder.member;
         const username = await context.redis.hGet(REMINDER_USERNAMES, conversationId);
 
-        const message: json2md.DataObject[] = [];
+        let message: json2md.DataObject;
         if (username) {
-            message.push({ p: `/u/${username}, you asked to be reminded about this modmail thread at this time.` });
+            message = { p: `/u/${username}, you asked to be reminded about this modmail thread at this time.` };
         } else {
-            message.push({ p: `Someone asked to be reminded about this modmail thread at this time.` });
+            message = { p: `Someone asked to be reminded about this modmail thread at this time.` };
         }
 
         await context.reddit.modMail.reply({
