@@ -62,7 +62,7 @@ export async function queueAdhocTask (context: TriggerContext) {
 
     await context.scheduler.runJob({
         name: SEND_REMINDER_JOB,
-        runAt: addSeconds(nextReminderDue, 1),
+        runAt: addSeconds(nextReminderDue, 5),
         data: { type: "adhoc" },
     });
 
