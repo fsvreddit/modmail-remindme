@@ -37,9 +37,9 @@ export async function queueAdhocTask (context: TriggerContext) {
         return;
     }
 
-    let nextReminderDue = new Date(reminderQueue[0].score);
-    if (nextReminderDue.getTime() < new Date().getTime()) {
-        nextReminderDue = new Date();
+    let nextReminderDue = DateTime.fromMillis(reminderQueue[0].score);
+    if (nextReminderDue < DateTime.now()) {
+        nextReminderDue = DateTime.now();
     }
 
     const cron = await context.redis.get(SEND_REMINDER_CRON_KEY);
@@ -47,10 +47,10 @@ export async function queueAdhocTask (context: TriggerContext) {
         console.error("Queue Adhoc Job: No cron found");
         return;
     }
-    const nextScheduledJob = CronExpressionParser.parse(cron).next().toDate();
+    const nextScheduledJob = DateTime.fromJSDate(CronExpressionParser.parse(cron).next().toDate());
 
-    if (nextReminderDue > DateTime.fromJSDate(nextScheduledJob).minus({ seconds: 30 }).toJSDate()) {
-        console.log(`Queue Adhoc Job: Next scheduled run (${nextScheduledJob.toISOString()}) is due too soon before the next reminder (${nextReminderDue.toISOString()})`);
+    if (nextReminderDue > nextScheduledJob.minus({ seconds: 30 })) {
+        console.log(`Queue Adhoc Job: Next scheduled run (${nextScheduledJob.toISO()}) is due too soon before the next reminder (${nextReminderDue.toISO()})`);
         return;
     }
 
@@ -62,11 +62,11 @@ export async function queueAdhocTask (context: TriggerContext) {
 
     await context.scheduler.runJob({
         name: SEND_REMINDER_JOB,
-        runAt: DateTime.fromJSDate(nextReminderDue).plus({ seconds: 5 }).toJSDate(),
+        runAt: nextReminderDue.plus({ seconds: 5 }).toJSDate(),
         data: { type: "adhoc" },
     });
 
-    console.log(`Queue Adhoc Job: Job scheduled for ${nextReminderDue.toISOString()}`);
+    console.log(`Queue Adhoc Job: Job scheduled for ${nextReminderDue.toISO()}`);
 }
 
 export async function sendReminders (_: unknown, context: JobContext) {
