@@ -16,7 +16,7 @@ export async function handleModmail (event: ModMail, context: TriggerContext) {
 
     const conversation = await context.reddit.modMail.getConversation({ conversationId: event.conversationId });
     if (!conversation.conversation) {
-        console.error("Modmail: Conversation not found");
+        console.error(`Modmail: Conversation ${event.conversationId} not found`);
         return;
     }
 
