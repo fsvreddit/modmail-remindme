@@ -28,12 +28,10 @@ export async function handleModmail (event: ModMail, context: TriggerContext) {
     }
 
     if (!currentMessage.bodyMarkdown) {
-        console.log(`Modmail: Message ${currentMessage.id} has no body`);
         return;
     }
 
     if (currentMessage.participatingAs !== "moderator") {
-        console.log(`Modmail: Message ${currentMessage.id} is not from a moderator`);
         return;
     }
 
@@ -67,7 +65,5 @@ export async function handleModmail (event: ModMail, context: TriggerContext) {
             body: json2md(message),
             isInternal: true,
         });
-    } else {
-        console.log(`Modmail: No RemindMe! command in message ${currentMessage.id}`);
     }
 }
