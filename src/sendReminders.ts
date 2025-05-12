@@ -79,7 +79,7 @@ export async function sendReminders (_: unknown, context: JobContext) {
 
         let message: json2md.DataObject;
         if (username) {
-            message = { p: `/u/${username}, you asked to be reminded about this modmail thread at this time.` };
+            message = { p: `/u/${username} asked to be reminded about this modmail thread at this time.` };
         } else {
             message = { p: `Someone asked to be reminded about this modmail thread at this time.` };
         }
