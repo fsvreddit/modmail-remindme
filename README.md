@@ -14,7 +14,7 @@ If an existing reminder for the modmail thread already exists, it will be replac
 
 You can put additional text in the modmail message that contains the command too, if you want to put a note in about *why* you are setting the reminder.
 
-If more than one command is found in the message, only the first one will be processed.
+If more than one reminder command is found in the message, only the first one will be processed.
 
 ## Cancelling reminders
 
