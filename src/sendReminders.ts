@@ -84,13 +84,16 @@ export async function sendReminders (_: unknown, context: JobContext) {
             message = { p: `Someone asked to be reminded about this modmail thread at this time.` };
         }
 
-        await context.reddit.modMail.reply({
-            conversationId,
-            body: json2md(message),
-            isInternal: true,
-        });
-
-        console.log(`Send Reminders: Reminder sent for conversation ${conversationId}`);
+        try {
+            await context.reddit.modMail.reply({
+                conversationId,
+                body: json2md(message),
+                isInternal: true,
+            });
+            console.log(`Send Reminders: Reminder sent for conversation ${conversationId}`);
+        } catch (error) {
+            console.error(`Send Reminders: Failed to send reminder for conversation ${conversationId}`, error);
+        }
 
         await context.redis.zRem(REMINDER_QUEUE, [conversationId]);
         await context.redis.hDel(REMINDER_USERNAMES, [conversationId]);
