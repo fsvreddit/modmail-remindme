@@ -1,4 +1,4 @@
-import { TriggerContext } from "@devvit/public-api";
+import { GetConversationResponse, TriggerContext } from "@devvit/public-api";
 import { ModMail } from "@devvit/protos";
 import { parseCancellation, parseCommandDate } from "./commandParser.js";
 import { cancelReminder, getConversationReminderDate, queueReminder } from "./sendReminders.js";
@@ -14,9 +14,16 @@ export async function handleModmail (event: ModMail, context: TriggerContext) {
         return;
     }
 
-    const conversation = await context.reddit.modMail.getConversation({ conversationId: event.conversationId });
-    if (!conversation.conversation) {
-        console.error(`Modmail: Conversation ${event.conversationId} not found`);
+    let conversation: GetConversationResponse;
+    try {
+        conversation = await context.reddit.modMail.getConversation({ conversationId: event.conversationId });
+        if (!conversation.conversation) {
+            console.error(`Modmail: Conversation ${event.conversationId} not found`);
+            return;
+        }
+    } catch (error) {
+        console.error(`Modmail: Error fetching conversation ${event.conversationId}`, error);
+        console.log(JSON.stringify(event, null, 2));
         return;
     }
 
