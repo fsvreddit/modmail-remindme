@@ -3,6 +3,9 @@ import { handleModmail } from "./modmail.js";
 import { handleInstallActions } from "./installActions.js";
 import { SEND_REMINDER_JOB } from "./constants.js";
 import { sendReminders } from "./sendReminders.js";
+import { appSettings } from "./settings.js";
+
+Devvit.addSettings(appSettings);
 
 Devvit.addTrigger({
     event: "ModMail",

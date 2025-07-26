@@ -4,6 +4,7 @@ import { SEND_REMINDER_CRON_KEY, SEND_REMINDER_JOB } from "./constants.js";
 import { DateTime } from "luxon";
 import pluralize from "pluralize";
 import json2md from "json2md";
+import { AppSetting } from "./settings.js";
 
 const REMINDER_QUEUE = "reminderQueue";
 const REMINDER_USERNAMES = "reminderUsernames";
@@ -77,22 +78,43 @@ export async function sendReminders (_: unknown, context: JobContext) {
         const conversationId = reminder.member;
         const username = await context.redis.hGet(REMINDER_USERNAMES, conversationId);
 
-        let message: json2md.DataObject;
-        if (username) {
-            message = { p: `/u/${username} asked to be reminded about this modmail thread at this time.` };
-        } else {
-            message = { p: `Someone asked to be reminded about this modmail thread at this time.` };
+        let sendReminder = true;
+        const sendForDeadAccounts = await context.settings.get<boolean>(AppSetting.SendRemindersForSuspendedAccounts);
+        if (!sendForDeadAccounts) {
+            const conversation = await context.reddit.modMail.getConversation({ conversationId });
+            const participant = conversation.conversation?.participant?.name;
+            if (participant === "[deleted]") {
+                sendReminder = false;
+            } else if (participant) {
+                try {
+                    const user = await context.reddit.getUserByUsername(participant);
+                    sendReminder = user !== undefined;
+                } catch {
+                    sendReminder = false;
+                }
+            }
         }
 
-        try {
-            await context.reddit.modMail.reply({
-                conversationId,
-                body: json2md(message),
-                isInternal: true,
-            });
-            console.log(`Send Reminders: Reminder sent for conversation ${conversationId}`);
-        } catch (error) {
-            console.error(`Send Reminders: Failed to send reminder for conversation ${conversationId}`, error);
+        if (sendReminder) {
+            let message: json2md.DataObject;
+            if (username) {
+                message = { p: `/u/${username} asked to be reminded about this modmail thread at this time.` };
+            } else {
+                message = { p: `Someone asked to be reminded about this modmail thread at this time.` };
+            }
+
+            try {
+                await context.reddit.modMail.reply({
+                    conversationId,
+                    body: json2md(message),
+                    isInternal: true,
+                });
+                console.log(`Send Reminders: Reminder sent for conversation ${conversationId}`);
+            } catch (error) {
+                console.error(`Send Reminders: Failed to send reminder for conversation ${conversationId}`, error);
+            }
+        } else {
+            console.log(`Send Reminders: Skipping reminder for conversation ${conversationId} due to deleted/suspended/shadowbanned account`);
         }
 
         await context.redis.zRem(REMINDER_QUEUE, [conversationId]);
