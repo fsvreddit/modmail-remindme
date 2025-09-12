@@ -44,7 +44,22 @@ export async function handleModmail (event: ModMail, context: TriggerContext) {
 
     const message: json2md.DataObject[] = [];
 
-    if (parseCancellation(currentMessage.bodyMarkdown)) {
+    const isCancellation = parseCancellation(currentMessage.bodyMarkdown);
+    const reminderDate = parseCommandDate(currentMessage.bodyMarkdown);
+    if (!isCancellation && !reminderDate) {
+        return;
+    }
+
+    const handledKey = `handled:${event.messageId}`;
+    const alreadyHandled = await context.redis.exists(handledKey);
+    if (alreadyHandled) {
+        console.log(`Modmail: Message ${event.messageId} already handled, duplicate trigger?`);
+        return;
+    }
+
+    await context.redis.set(handledKey, "true", { expiration: DateTime.now().plus({ days: 1 }).toJSDate() });
+
+    if (isCancellation) {
         const reminderDate = await getConversationReminderDate(event.conversationId, context);
         if (!reminderDate) {
             console.log(`Modmail: Cancellation command received, but no reminder date found for conversation ${event.conversationId}`);
@@ -55,7 +70,6 @@ export async function handleModmail (event: ModMail, context: TriggerContext) {
         }
     };
 
-    const reminderDate = parseCommandDate(currentMessage.bodyMarkdown);
     if (reminderDate) {
         console.log(`Modmail: Remind command found in message ${currentMessage.id} for ${formatDate(reminderDate)}`);
         const existingReminderDate = await getConversationReminderDate(event.conversationId, context);

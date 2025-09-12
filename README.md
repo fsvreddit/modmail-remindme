@@ -22,6 +22,10 @@ Use the same command with "cancel" after e.g. `RemindMe! cancel`.
 
 ## Change History
 
+## v1.1.4
+
+* Fix issue that could result in reminder commands being processed more than once.
+
 ## v1.1
 
 * Add option to send reminders if the account the modmail is about has been deleted, shadowbanned or suspended.
