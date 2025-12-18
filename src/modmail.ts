@@ -4,10 +4,7 @@ import { parseCancellation, parseCommandDate } from "./commandParser.js";
 import { cancelReminder, getConversationReminderDate, queueReminder } from "./sendReminders.js";
 import json2md from "json2md";
 import { DateTime } from "luxon";
-
-export function formatDate (date: DateTime) {
-    return date.toFormat("EEEE, MMM d, yyyy 'at' HH:mm 'UTC'");
-}
+import { formatDate } from "./common.js";
 
 export async function handleModmail (event: ModMail, context: TriggerContext) {
     if (event.messageAuthor?.name === context.appName) {
@@ -74,9 +71,9 @@ export async function handleModmail (event: ModMail, context: TriggerContext) {
         console.log(`Modmail: Remind command found in message ${currentMessage.id} for ${formatDate(reminderDate)}`);
         const existingReminderDate = await getConversationReminderDate(event.conversationId, context);
         await queueReminder(event.conversationId, currentMessage.author?.name, reminderDate, context);
-        message.push({ p: `A reminder for this modmail conversation has been scheduled for ${formatDate(reminderDate)}.` });
+        message.push({ p: `A reminder for this modmail conversation has been scheduled for ${formatDate(reminderDate)} UTC.` });
         if (existingReminderDate) {
-            message.push({ p: `A previous reminder was scheduled for ${formatDate(existingReminderDate)}, and this has been replaced.` });
+            message.push({ p: `A previous reminder was scheduled for ${formatDate(existingReminderDate)} UTC, and this has been replaced.` });
         }
     }
 

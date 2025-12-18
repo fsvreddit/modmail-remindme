@@ -1,10 +1,11 @@
-import { JobContext, TriggerContext } from "@devvit/public-api";
+import { JobContext, ScheduledJob, TriggerContext } from "@devvit/public-api";
 import { CronExpressionParser } from "cron-parser";
 import { SEND_REMINDER_CRON_KEY, SEND_REMINDER_JOB } from "./constants.js";
 import { DateTime } from "luxon";
 import pluralize from "pluralize";
 import json2md from "json2md";
 import { AppSetting } from "./settings.js";
+import { formatDate } from "./common.js";
 
 const REMINDER_QUEUE = "reminderQueue";
 const REMINDER_USERNAMES = "reminderUsernames";
@@ -44,22 +45,32 @@ export async function queueAdhocTask (context: TriggerContext) {
     }
 
     const cron = await context.redis.get(SEND_REMINDER_CRON_KEY);
-    if (!cron) {
-        console.error("Queue Adhoc Job: No cron found");
-        return;
-    }
-    const nextScheduledJob = DateTime.fromJSDate(CronExpressionParser.parse(cron).next().toDate());
+    if (cron) {
+        const nextScheduledJob = DateTime.fromJSDate(CronExpressionParser.parse(cron).next().toDate());
 
-    if (nextReminderDue > nextScheduledJob.minus({ seconds: 30 })) {
-        console.log(`Queue Adhoc Job: Next scheduled run (${nextScheduledJob.toISO()}) is due too soon before the next reminder (${nextReminderDue.toISO()})`);
-        return;
+        if (nextReminderDue > nextScheduledJob.minus({ seconds: 30 })) {
+            console.log(`Queue Adhoc Job: Next scheduled run (${formatDate(nextScheduledJob)}) is due too soon before the next reminder (${formatDate(nextReminderDue)})`);
+            return;
+        }
     }
 
-    // Cancel any existing adhoc jobs
+    // Check for any existing adhoc jobs
     const currentJobs = await context.scheduler.listJobs();
-    const adhocJobs = currentJobs.filter(job => job.name === SEND_REMINDER_JOB && job.data?.type === "adhoc");
-    await Promise.all(adhocJobs.map(job => context.scheduler.cancelJob(job.id)));
-    console.log(`Queue Adhoc Job: ${adhocJobs.length} existing adhoc ${pluralize("job", adhocJobs.length)} cancelled`);
+    const adhocJobs = currentJobs.filter(job => job.name === SEND_REMINDER_JOB && job.data?.type === "adhoc") as ScheduledJob[];
+
+    if (adhocJobs.length > 1) {
+        console.warn(`Queue Adhoc Job: Found ${adhocJobs.length} existing adhoc ${pluralize("job", adhocJobs.length)}, cancelling all to avoid duplicates`);
+        await Promise.all(adhocJobs.map(job => context.scheduler.cancelJob(job.id)));
+    } else if (adhocJobs.length === 1) {
+        const adhocJob = adhocJobs[0];
+        if (adhocJob.runAt <= nextReminderDue.toJSDate()) {
+            console.log(`Queue Adhoc Job: Existing adhoc job scheduled for ${formatDate(DateTime.fromJSDate(adhocJob.runAt))} is sooner than next reminder due at ${formatDate(nextReminderDue)}`);
+            return;
+        } else {
+            console.log(`Queue Adhoc Job: Cancelling existing adhoc job scheduled for ${formatDate(DateTime.fromJSDate(adhocJob.runAt))}`);
+            await context.scheduler.cancelJob(adhocJob.id);
+        }
+    }
 
     await context.scheduler.runJob({
         name: SEND_REMINDER_JOB,
@@ -67,7 +78,7 @@ export async function queueAdhocTask (context: TriggerContext) {
         data: { type: "adhoc" },
     });
 
-    console.log(`Queue Adhoc Job: Job scheduled for ${nextReminderDue.toISO()}`);
+    console.log(`Queue Adhoc Job: Job scheduled for ${formatDate(nextReminderDue)}`);
 }
 
 export async function sendReminders (_: unknown, context: JobContext) {
