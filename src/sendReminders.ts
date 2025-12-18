@@ -39,7 +39,7 @@ export async function queueAdhocTask (context: TriggerContext) {
         return;
     }
 
-    let nextReminderDue = DateTime.fromMillis(reminderQueue[0].score);
+    let nextReminderDue = DateTime.fromMillis(reminderQueue[0].score).plus({ seconds: 5 });
     if (nextReminderDue < DateTime.now()) {
         nextReminderDue = DateTime.now();
     }
@@ -74,7 +74,7 @@ export async function queueAdhocTask (context: TriggerContext) {
 
     await context.scheduler.runJob({
         name: SEND_REMINDER_JOB,
-        runAt: nextReminderDue.plus({ seconds: 5 }).toJSDate(),
+        runAt: nextReminderDue.toJSDate(),
         data: { type: "adhoc" },
     });
 
