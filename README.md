@@ -8,19 +8,25 @@ In modmail, use the command `RemindMe!`, `!remind` or `!remindme`, with the peri
 * `RemindMe! 2 weeks`
 * `RemindMe! 6 months`
 
-Intervals supported are `minute`, `hour`, `day`, `week`, `month` and `year`. If you don't specify an interval, then the app assumes days.
+Intervals supported are `minute`, `hour`, `day`, `week`, `month` and `year`. If you don't specify an interval, then the app assumes days. E.g. `RemindMe! 4` will set a reminder for four days from the time the command is issued.
 
 If an existing reminder for the modmail thread already exists, it will be replaced with the new one.
 
-You can put additional text in the modmail message that contains the command too, if you want to put a note in about *why* you are setting the reminder.
+For convenience, you can put additional text in the modmail message that contains the command too, if you want to put a note in about *why* you are setting the reminder.
 
 If more than one reminder command is found in the message, only the first one will be processed.
 
+The app will reply to your message with a private moderator note confirming that the reminder has been set, and if applicable that the previous reminder was replaced.
+
 ## Cancelling reminders
 
-Use the same command with "cancel" after e.g. `RemindMe! cancel`.
+Use the same command with "cancel" after e.g. `RemindMe! cancel`. Again, the app will reply to confirm cancellation.
 
 ## Change History
+
+## v1.1.9
+
+* Update Devvit version, improve logging and efficiency
 
 ## v1.1.5
 
