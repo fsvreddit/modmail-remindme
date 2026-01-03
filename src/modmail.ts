@@ -71,9 +71,9 @@ export async function handleModmail (event: ModMail, context: TriggerContext) {
         console.log(`Modmail: Remind command found in message ${currentMessage.id} for ${formatDateForLogs(reminderDate)}`);
         const existingReminderDate = await getConversationReminderDate(event.conversationId, context);
         await queueReminder(event.conversationId, currentMessage.author?.name, reminderDate, context);
-        message.push({ p: `A reminder for this modmail conversation has been scheduled for ${formatDateForModmail(reminderDate)} UTC.` });
+        message.push({ p: `A reminder for this modmail conversation has been scheduled for ${formatDateForModmail(reminderDate)}.` });
         if (existingReminderDate) {
-            message.push({ p: `A previous reminder was scheduled for ${formatDateForModmail(existingReminderDate)} UTC, and this has been replaced.` });
+            message.push({ p: `A previous reminder was scheduled for ${formatDateForModmail(existingReminderDate)}, and this has been replaced.` });
         }
     }
 

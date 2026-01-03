@@ -20,7 +20,7 @@ export async function handleInstallActions (_: AppInstall | AppUpgrade, context:
 
     await queueAdhocTask(context);
 
-    console.log("Install Actions: A new version of the app has been installed or upgraded.");
+    console.log(`Install Actions: A new version of the app has been installed or upgraded. Now on ${context.appVersion}`);
     const queuedTasks = await getReminderQueueSize(context);
     console.log(`Install Actions: There are currently ${pluralize("reminder", queuedTasks, true)} queued.`);
 }

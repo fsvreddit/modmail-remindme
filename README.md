@@ -24,7 +24,7 @@ Use the same command with "cancel" after e.g. `RemindMe! cancel`. Again, the app
 
 ## Change History
 
-## v1.1.10
+## v1.1.12
 
 * Fix modmail output to use more human-friendly date/time output again
 
