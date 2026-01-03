@@ -1,7 +1,8 @@
 import { TriggerContext } from "@devvit/public-api";
 import { AppInstall, AppUpgrade } from "@devvit/protos";
 import { SEND_REMINDER_CRON_KEY, SEND_REMINDER_JOB } from "./constants.js";
-import { queueAdhocTask } from "./sendReminders.js";
+import { getReminderQueueSize, queueAdhocTask } from "./sendReminders.js";
+import pluralize from "pluralize";
 
 export async function handleInstallActions (_: AppInstall | AppUpgrade, context: TriggerContext) {
     const currentJobs = await context.scheduler.listJobs();
@@ -20,4 +21,6 @@ export async function handleInstallActions (_: AppInstall | AppUpgrade, context:
     await queueAdhocTask(context);
 
     console.log("Install Actions: A new version of the app has been installed or upgraded.");
+    const queuedTasks = await getReminderQueueSize(context);
+    console.log(`Install Actions: There are currently ${pluralize("reminder", queuedTasks, true)} queued.`);
 }

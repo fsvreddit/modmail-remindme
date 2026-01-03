@@ -5,10 +5,14 @@ import { DateTime } from "luxon";
 import pluralize from "pluralize";
 import json2md from "json2md";
 import { AppSetting } from "./settings.js";
-import { formatDate } from "./common.js";
+import { formatDateForLogs } from "./common.js";
 
 const REMINDER_QUEUE = "reminderQueue";
 const REMINDER_USERNAMES = "reminderUsernames";
+
+export async function getReminderQueueSize (context: TriggerContext): Promise<number> {
+    return context.redis.zCard(REMINDER_QUEUE);
+}
 
 export async function queueReminder (conversationId: string, username: string | undefined, reminderDate: DateTime, context: TriggerContext) {
     await context.redis.zAdd(REMINDER_QUEUE, { member: conversationId, score: reminderDate.toMillis() });
@@ -49,7 +53,7 @@ export async function queueAdhocTask (context: TriggerContext) {
         const nextScheduledJob = DateTime.fromJSDate(CronExpressionParser.parse(cron).next().toDate());
 
         if (nextReminderDue > nextScheduledJob.minus({ seconds: 30 })) {
-            console.log(`Queue Adhoc Job: Next scheduled run (${formatDate(nextScheduledJob)}) is due too soon before the next reminder (${formatDate(nextReminderDue)})`);
+            console.log(`Queue Adhoc Job: Next scheduled run (${formatDateForLogs(nextScheduledJob)}) is due too soon before the next reminder (${formatDateForLogs(nextReminderDue)})`);
             return;
         }
     }
@@ -63,11 +67,14 @@ export async function queueAdhocTask (context: TriggerContext) {
         await Promise.all(adhocJobs.map(job => context.scheduler.cancelJob(job.id)));
     } else if (adhocJobs.length === 1) {
         const adhocJob = adhocJobs[0];
-        if (adhocJob.runAt <= nextReminderDue.toJSDate()) {
-            console.log(`Queue Adhoc Job: Existing adhoc job scheduled for ${formatDate(DateTime.fromJSDate(adhocJob.runAt))} is sooner than next reminder due at ${formatDate(nextReminderDue)}`);
+        if (adhocJob.runAt === nextReminderDue.toJSDate()) {
+            console.log(`Queue Adhoc Job: Existing adhoc job already scheduled for ${formatDateForLogs(DateTime.fromJSDate(adhocJob.runAt))}`);
+            return;
+        } else if (adhocJob.runAt < nextReminderDue.toJSDate()) {
+            console.log(`Queue Adhoc Job: Existing adhoc job scheduled for ${formatDateForLogs(DateTime.fromJSDate(adhocJob.runAt))} is sooner than next reminder due at ${formatDateForLogs(nextReminderDue)}`);
             return;
         } else {
-            console.log(`Queue Adhoc Job: Cancelling existing adhoc job scheduled for ${formatDate(DateTime.fromJSDate(adhocJob.runAt))}`);
+            console.log(`Queue Adhoc Job: Cancelling existing adhoc job scheduled for ${formatDateForLogs(DateTime.fromJSDate(adhocJob.runAt))}`);
             await context.scheduler.cancelJob(adhocJob.id);
         }
     }
@@ -78,7 +85,7 @@ export async function queueAdhocTask (context: TriggerContext) {
         data: { type: "adhoc" },
     });
 
-    console.log(`Queue Adhoc Job: Job scheduled for ${formatDate(nextReminderDue)}`);
+    console.log(`Queue Adhoc Job: Job scheduled for ${formatDateForLogs(nextReminderDue)}`);
 }
 
 export async function sendReminders (_: unknown, context: JobContext) {

@@ -4,7 +4,7 @@ import { parseCancellation, parseCommandDate } from "./commandParser.js";
 import { cancelReminder, getConversationReminderDate, queueReminder } from "./sendReminders.js";
 import json2md from "json2md";
 import { DateTime } from "luxon";
-import { formatDate } from "./common.js";
+import { formatDateForLogs, formatDateForModmail } from "./common.js";
 
 export async function handleModmail (event: ModMail, context: TriggerContext) {
     if (event.messageAuthor?.name === context.appName) {
@@ -63,17 +63,17 @@ export async function handleModmail (event: ModMail, context: TriggerContext) {
             message.push({ p: "No reminder is scheduled for this modmail conversation." });
         } else {
             await cancelReminder(event.conversationId, context);
-            message.push({ p: `Reminder for this modmail conversation has been cancelled. The reminder was scheduled for ${formatDate(reminderDate)}.` });
+            message.push({ p: `Reminder for this modmail conversation has been cancelled. The reminder was scheduled for ${formatDateForLogs(reminderDate)}.` });
         }
     };
 
     if (reminderDate) {
-        console.log(`Modmail: Remind command found in message ${currentMessage.id} for ${formatDate(reminderDate)}`);
+        console.log(`Modmail: Remind command found in message ${currentMessage.id} for ${formatDateForLogs(reminderDate)}`);
         const existingReminderDate = await getConversationReminderDate(event.conversationId, context);
         await queueReminder(event.conversationId, currentMessage.author?.name, reminderDate, context);
-        message.push({ p: `A reminder for this modmail conversation has been scheduled for ${formatDate(reminderDate)} UTC.` });
+        message.push({ p: `A reminder for this modmail conversation has been scheduled for ${formatDateForModmail(reminderDate)} UTC.` });
         if (existingReminderDate) {
-            message.push({ p: `A previous reminder was scheduled for ${formatDate(existingReminderDate)} UTC, and this has been replaced.` });
+            message.push({ p: `A previous reminder was scheduled for ${formatDateForModmail(existingReminderDate)} UTC, and this has been replaced.` });
         }
     }
 
