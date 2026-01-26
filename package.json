@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@devvit/web": "0.12.9",
+    "@devvit/shared-types": "0.12.9",
     "cron-parser": "^5.5.0",
     "eslint": "^9.39.2",
     "express": "^5.2.0",
