@@ -65,20 +65,17 @@ export async function queueAdhocTask () {
         console.warn(`Queue Adhoc Job: Found ${adhocJobs.length} existing adhoc ${pluralize("job", adhocJobs.length)}, cancelling all to avoid duplicates`);
         await Promise.all(adhocJobs.map(job => scheduler.cancelJob(job.id)));
     } else if (adhocJobs.length === 1) {
-        const adhocJob = adhocJobs[0];
-        if (!adhocJob) {
+        const nextAdhocJob = adhocJobs[0];
+        if (!nextAdhocJob) {
             throw new Error("Queue Adhoc Job: Failed to retrieve existing adhoc job details");
         }
 
-        if (adhocJob.runAt === nextReminderDue.toJSDate()) {
-            console.log(`Queue Adhoc Job: Existing adhoc job already scheduled for ${formatDateForLogs(DateTime.fromJSDate(adhocJob.runAt))}`);
-            return;
-        } else if (adhocJob.runAt < nextReminderDue.toJSDate()) {
-            console.log(`Queue Adhoc Job: Existing adhoc job scheduled for ${formatDateForLogs(DateTime.fromJSDate(adhocJob.runAt))} is sooner than next reminder due at ${formatDateForLogs(nextReminderDue)}`);
+        if (nextAdhocJob.runAt < nextReminderDue.plus({ seconds: 5 }).toJSDate()) {
+            console.log(`Queue Adhoc Job: Existing adhoc job is scheduled for ${formatDateForLogs(DateTime.fromJSDate(nextAdhocJob.runAt))}`);
             return;
         } else {
-            console.log(`Queue Adhoc Job: Cancelling existing adhoc job scheduled for ${formatDateForLogs(DateTime.fromJSDate(adhocJob.runAt))}`);
-            await scheduler.cancelJob(adhocJob.id);
+            console.log(`Queue Adhoc Job: Cancelling existing adhoc job scheduled for ${formatDateForLogs(DateTime.fromJSDate(nextAdhocJob.runAt))}`);
+            await scheduler.cancelJob(nextAdhocJob.id);
         }
     }
 
