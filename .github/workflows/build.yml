@@ -28,7 +28,7 @@ jobs:
       run: npx tsc --build --noEmit
 
     - name: Build
-      run: npx vite build
+      run: npx vite build src/server
 
     - name: Test
       run: npx vitest run --passWithNoTests
