@@ -8,7 +8,7 @@
     "login": "devvit login",
     "type-check": "tsc --build --noEmit",
     "build": "cd src/server && vite build",
-    "test": "npx vitest run --passWithNoTests",
+    "test": "cd src/server && npx vitest run --passWithNoTests",
     "playtest": "devvit playtest",
     "deploy": "devvit upload",
     "publish": "devvit publish",

@@ -6,7 +6,8 @@
             "ES2023"
         ],
         "types": [
-            "node"
+            "node",
+            "vitest/globals"
         ],
         "rootDir": ".",
         "outDir": "../../dist/types/server",
@@ -17,8 +18,5 @@
         "**/*",
         "**/*.json",
         "../../package.json"
-    ],
-    "exclude": [
-        "**/*.test.ts"
     ],
 }

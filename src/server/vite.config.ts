@@ -5,7 +5,7 @@ export default defineConfig({
     ssr: {
         noExternal: true,
     },
-    logLevel: 'warn',
+    logLevel: "warn",
     build: {
         ssr: "main.ts",
         outDir: "../../dist/server",
