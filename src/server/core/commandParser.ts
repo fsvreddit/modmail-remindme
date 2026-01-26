@@ -8,7 +8,7 @@ export function parseCancellation (message: string): boolean {
 export function parseCommandDate (message: string, baseline?: Date): DateTime | undefined {
     const commandRegex = /(?:!remind(?:me)?|RemindMe!) (\d+)(?: )?(minute|hour|day|week|month|year)?s?/i;
     const matches = commandRegex.exec(message);
-    if (!matches) {
+    if (!matches?.[1]) {
         return;
     }
 

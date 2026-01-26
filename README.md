@@ -24,6 +24,10 @@ Use the same command with "cancel" after e.g. `RemindMe! cancel`. Again, the app
 
 ## Change History
 
+## v1.2
+
+* Update to use Devvit Web and latest dependencies. No user facing changes.
+
 ## v1.1.12
 
 * Fix modmail output to use more human-friendly date/time output again
