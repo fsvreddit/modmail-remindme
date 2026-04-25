@@ -15,10 +15,9 @@
     "logs": "devvit logs"
   },
   "dependencies": {
-    "@devvit/web": "0.12.9",
-    "@devvit/shared-types": "0.12.9",
+    "@devvit/web": "0.12.20",
+    "@devvit/shared-types": "0.12.20",
     "cron-parser": "^5.5.0",
-    "eslint": "^9.39.2",
     "express": "^5.2.0",
     "json2md": "^2.0.3",
     "luxon": "^3.7.2",
@@ -31,7 +30,8 @@
     "@types/json2md": "^1.5.4",
     "@types/luxon": "^3.7.1",
     "@types/pluralize": "^0.0.33",
-    "devvit": "0.12.9",
+    "devvit": "0.12.20",
+    "eslint": "^10.0.0",
     "typescript": "5.8.3",
     "vitest": "^4.0.14"
   }
