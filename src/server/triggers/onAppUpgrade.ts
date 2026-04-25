@@ -1,8 +1,8 @@
-import { Request, Response } from "express";
+import { Context } from "hono";
 import { queueAdhocTask } from "../core";
 
-export const onAppUpgrade = async (_: Request, response: Response) => {
+export const onAppUpgrade = async (context: Context) => {
     await queueAdhocTask();
 
-    return response.status(200).json({ message: "app upgraded" });
+    return context.json({ message: "app upgraded" }, 200);
 };

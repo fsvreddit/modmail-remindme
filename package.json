@@ -15,10 +15,11 @@
     "logs": "devvit logs"
   },
   "dependencies": {
-    "@devvit/web": "0.12.20",
     "@devvit/shared-types": "0.12.20",
+    "@devvit/web": "0.12.20",
+    "@hono/node-server": "^2.0.0",
     "cron-parser": "^5.5.0",
-    "express": "^5.2.0",
+    "hono": "^4.12.15",
     "json2md": "^2.0.3",
     "luxon": "^3.7.2",
     "pluralize": "^8.0.0",
@@ -26,7 +27,6 @@
   },
   "devDependencies": {
     "@fsvreddit/eslint-config": "github:fsvreddit/eslint-config",
-    "@types/express": "^5.0.5",
     "@types/json2md": "^1.5.4",
     "@types/luxon": "^3.7.1",
     "@types/pluralize": "^0.0.33",

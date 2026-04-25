@@ -1,10 +1,11 @@
-import { Request, Response } from "express";
+import { Context } from "hono";
 import { sendReminders } from "../core";
 
-export const sendReminderJob = async (request: Request, response: Response) => {
-    console.log("sendReminderJob:", request.body);
+export const sendReminderJob = async (context: Context) => {
+    const body = await context.req.text();
+    console.log("sendReminderJob:", body);
 
     await sendReminders();
 
-    return response.status(200).send({ message: "reminder sent" });
+    return context.json({ message: "reminder sent" }, 200);
 };
