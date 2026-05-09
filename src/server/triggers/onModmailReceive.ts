@@ -1,8 +1,7 @@
-import { context, GetConversationResponse, reddit, redis } from "@devvit/web/server";
+import { context, GetConversationResponse, reddit } from "@devvit/web/server";
 import { OnModMailRequest } from "@devvit/web/shared";
 import { Context } from "hono";
-import { cancelReminder, formatDateForLogs, formatDateForModmail, getConversationReminderDate, parseCancellation, parseCommandDate, queueReminder } from "../core";
-import { DateTime } from "luxon";
+import { cancelReminder, formatDateForLogs, formatDateForModmail, getConversationReminderDate, hasTriggerBeenHandled, parseCancellation, parseCommandDate, queueReminder } from "../core";
 import json2md from "json2md";
 
 export const onModmailReceive = async (c: Context) => {
@@ -48,14 +47,10 @@ export const onModmailReceive = async (c: Context) => {
         return c.json({ message: "no action needed" }, 200);
     }
 
-    const handledKey = `handled:${event.messageId}`;
-    const alreadyHandled = await redis.exists(handledKey);
-    if (alreadyHandled) {
+    if (await hasTriggerBeenHandled(event.messageId)) {
         console.log(`Modmail: Message ${event.messageId} already handled, duplicate trigger?`);
         return c.json({ message: "duplicate trigger" }, 200);
     }
-
-    await redis.set(handledKey, "true", { expiration: DateTime.now().plus({ days: 1 }).toJSDate() });
 
     if (isCancellation) {
         const reminderDate = await getConversationReminderDate(event.conversationId);

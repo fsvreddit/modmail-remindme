@@ -24,6 +24,10 @@ Use the same command with "cancel" after e.g. `RemindMe! cancel`. Again, the app
 
 ## Change History
 
+## v1.2.1
+
+* Mitigate against duplicate actions if the Developer Platform is having issues
+
 ## v1.2
 
 * Update to use Devvit Web and latest dependencies. No user facing changes.
