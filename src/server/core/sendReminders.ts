@@ -3,7 +3,7 @@ import { DateTime } from "luxon";
 import pluralize from "pluralize";
 import json2md from "json2md";
 import { AppSetting, formatDateForLogs, SchedulerJob, SEND_REMINDER_CRON } from ".";
-import CronExpressionParser from "cron-parser";
+import { CronExpressionParser } from "cron-parser";
 
 const REMINDER_QUEUE = "reminderQueue";
 const REMINDER_USERNAMES = "reminderUsernames";

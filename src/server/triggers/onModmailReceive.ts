@@ -1,14 +1,15 @@
 import { context, GetConversationResponse, reddit } from "@devvit/web/server";
-import { OnModMailRequest } from "@devvit/web/shared";
+import { OnModMailRequest, TriggerResponse } from "@devvit/web/shared";
 import { Context } from "hono";
-import { cancelReminder, formatDateForLogs, formatDateForModmail, getConversationReminderDate, hasTriggerBeenHandled, parseCancellation, parseCommandDate, queueReminder } from "../core";
+import { cancelReminder, formatDateForLogs, formatDateForModmail, getConversationReminderDate, parseCancellation, parseCommandDate, queueReminder } from "../core";
 import json2md from "json2md";
+import { hasTriggerBeenHandled } from "@fsvreddit/fsv-devvit-web-helpers";
 
 export const onModmailReceive = async (c: Context) => {
     const event = await c.req.json<OnModMailRequest>();
 
     if (event.messageAuthor?.name === context.appSlug) {
-        return c.json({ message: "ignoring self message" }, 200);
+        return c.json<TriggerResponse>({ message: "ignoring self message" }, 200);
     }
 
     let conversation: GetConversationResponse;
@@ -16,27 +17,27 @@ export const onModmailReceive = async (c: Context) => {
         conversation = await reddit.modMail.getConversation({ conversationId: event.conversationId });
         if (!conversation.conversation) {
             console.error(`Modmail: Conversation ${event.conversationId} not found`);
-            return c.json({ message: "conversation not found" }, 404);
+            return c.json<TriggerResponse>({ message: "conversation not found" }, 404);
         }
     } catch (error) {
         console.error(`Modmail: Error fetching conversation ${event.conversationId}`, error);
         console.log(JSON.stringify(event, null, 2));
-        return c.json({ message: "error fetching conversation" }, 500);
+        return c.json<TriggerResponse>({ message: "error fetching conversation" }, 500);
     }
 
     const messagesInConversation = Object.values(conversation.conversation.messages);
     const currentMessage = messagesInConversation.find(message => message.id && event.messageId.includes(message.id));
     if (!currentMessage) {
         console.error("Modmail: Current message not found");
-        return c.json({ message: "current message not found" }, 400);
+        return c.json<TriggerResponse>({ message: "current message not found" }, 400);
     }
 
     if (!currentMessage.bodyMarkdown) {
-        return c.json({ message: "no body markdown" }, 200);
+        return c.json<TriggerResponse>({ message: "no body markdown" }, 200);
     }
 
     if (currentMessage.participatingAs !== "moderator") {
-        return c.json({ message: "not a mod message" }, 200);
+        return c.json<TriggerResponse>({ message: "not a mod message" }, 200);
     }
 
     const message: json2md.DataObject[] = [];
@@ -44,12 +45,12 @@ export const onModmailReceive = async (c: Context) => {
     const isCancellation = parseCancellation(currentMessage.bodyMarkdown);
     const reminderDate = parseCommandDate(currentMessage.bodyMarkdown);
     if (!isCancellation && !reminderDate) {
-        return c.json({ message: "no action needed" }, 200);
+        return c.json<TriggerResponse>({ message: "no action needed" }, 200);
     }
 
-    if (await hasTriggerBeenHandled(event.messageId)) {
+    if (await hasTriggerBeenHandled(event.messageId, { verboseLogs: true })) {
         console.log(`Modmail: Message ${event.messageId} already handled, duplicate trigger?`);
-        return c.json({ message: "duplicate trigger" }, 200);
+        return c.json<TriggerResponse>({ message: "duplicate trigger" }, 200);
     }
 
     if (isCancellation) {
@@ -82,5 +83,5 @@ export const onModmailReceive = async (c: Context) => {
         });
     }
 
-    return c.json({ message: "modmail received" }, 200);
+    return c.json<TriggerResponse>({ message: "modmail received" }, 200);
 };

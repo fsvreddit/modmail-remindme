@@ -17,6 +17,7 @@
   "dependencies": {
     "@devvit/shared-types": "0.12.22",
     "@devvit/web": "0.12.22",
+    "@fsvreddit/fsv-devvit-web-helpers": "github:fsvreddit/fsv-devvit-web-helpers",
     "@hono/node-server": "^2.0.0",
     "cron-parser": "^5.5.0",
     "hono": "^4.12.15",

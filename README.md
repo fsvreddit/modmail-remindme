@@ -24,6 +24,10 @@ Use the same command with "cancel" after e.g. `RemindMe! cancel`. Again, the app
 
 ## Change History
 
+## v1.2.3
+
+* Fixed an issue introduced in v1.2.2 which could cause reminders not to send at the right time, and app response messages not to be sent.
+
 ## v1.2.1
 
 * Mitigate against duplicate actions if the Developer Platform is having issues
