@@ -25,5 +25,5 @@ export function parseCommandDate (message: string, baseline?: Date): DateTime | 
         years: timeUnit === "year" ? timeValue : undefined,
     };
 
-    return DateTime.fromJSDate(baseline).plus(duration);
+    return DateTime.fromJSDate(baseline, { zone: "utc" }).plus(duration);
 }
