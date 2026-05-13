@@ -2,12 +2,13 @@ import { readFile } from "fs/promises";
 import { join } from "path";
 import { AppSetting, Endpoint, SchedulerJob, SEND_REMINDER_CRON } from "./constants.js";
 import { AppConfig } from "@devvit/shared-types/schemas/config-file.v1.js";
+import { describe, expect, test, beforeAll } from "vitest";
 
 let devvitConfig: AppConfig;
 
 beforeAll(async () => {
     // Read devvit.json from the project root
-    const devvitPath = join(process.cwd(), "../..", "devvit.json");
+    const devvitPath = join(process.cwd(), ".", "devvit.json");
     const content = await readFile(devvitPath, "utf-8");
     devvitConfig = JSON.parse(content) as AppConfig;
 });

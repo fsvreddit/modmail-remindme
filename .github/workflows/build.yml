@@ -1,34 +1,17 @@
-name: Build and Test
-
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-
+name: build-lint
+on: push
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20' # Or your desired Node.js version
-
-    - name: Install dependencies
-      run: npm install
-
-    - name: Type check
-      run: npx tsc --build --noEmit
-
-    - name: Build
-      run: npx vite build src/server
-
-    - name: Test
-      run: npx vitest run --passWithNoTests
+      - name: checkout repo
+        uses: actions/checkout@v4
+      - name: use node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+      - run: npm install
+      - run: npx eslint
+      - run: npm run type-check
+      - run: npm run build
+      - run: npm run test
