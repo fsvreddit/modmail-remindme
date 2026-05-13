@@ -1,4 +1,5 @@
 import { parseCancellation, parseCommandDate } from "./commandParser.js";
+import { expect, test } from "vitest";
 
 test("parseCancellation", () => {
     const testCases = [

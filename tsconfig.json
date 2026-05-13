@@ -1,8 +1,7 @@
 {
-    "files": [],
-    "references": [
-        {
-            "path": "./src/server"
-        }
-    ]
+  "files": [],
+  "references": [
+    { "path": "./tools/tsconfig.server.json" },
+    { "path": "./tools/tsconfig.vite.json" }
+  ]
 }
