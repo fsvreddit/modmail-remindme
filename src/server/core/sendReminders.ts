@@ -61,22 +61,9 @@ export async function queueAdhocTask () {
 
     console.log(`Queue Adhoc Job: Found ${adhocJobs.length} existing adhoc ${pluralize("job", adhocJobs.length)} and ${cronJobs.length} cron ${pluralize("job", cronJobs.length)}`);
 
-    if (adhocJobs.length > 1) {
+    if (adhocJobs.length > 0) {
         console.warn(`Queue Adhoc Job: Found ${adhocJobs.length} existing adhoc ${pluralize("job", adhocJobs.length)}, cancelling all to avoid duplicates`);
         await Promise.all(adhocJobs.map(job => scheduler.cancelJob(job.id)));
-    } else if (adhocJobs.length === 1) {
-        const nextAdhocJob = adhocJobs[0];
-        if (!nextAdhocJob) {
-            throw new Error("Queue Adhoc Job: Failed to retrieve existing adhoc job details");
-        }
-
-        if (nextAdhocJob.runAt < nextReminderDue.plus({ seconds: 5 }).toJSDate()) {
-            console.log(`Queue Adhoc Job: Existing adhoc job is scheduled for ${formatDateForLogs(DateTime.fromJSDate(nextAdhocJob.runAt))}`);
-            return;
-        } else {
-            console.log(`Queue Adhoc Job: Cancelling existing adhoc job scheduled for ${formatDateForLogs(DateTime.fromJSDate(nextAdhocJob.runAt))}`);
-            await scheduler.cancelJob(nextAdhocJob.id);
-        }
     }
 
     await scheduler.runJob({

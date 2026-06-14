@@ -3,7 +3,7 @@
     "name": "modmailremindme",
     "server": {
         "dir": "dist/server",
-        "entry": "main.cjs"
+        "entry": "index.cjs"
     },
     "triggers": {
         "onModMail": "/internal/triggers/modmail",

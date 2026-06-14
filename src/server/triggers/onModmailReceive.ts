@@ -81,6 +81,10 @@ export const onModmailReceive = async (c: Context) => {
             body: messageBody,
             isInternal: true,
         });
+
+        if (conversation.conversation.state?.toLowerCase() === "archived") {
+            await reddit.modMail.archiveConversation(event.conversationId);
+        }
     }
 
     return c.json<TriggerResponse>({ message: "modmail received" }, 200);
