@@ -26,6 +26,10 @@ Use the same command with "cancel" after e.g. `RemindMe! cancel`. Again, the app
 
 For older changes, please see the [full changelog](https://github.com/fsvreddit/modmail-remindme/blob/main/changelog.md)
 
+## v1.2.5
+
+* Mitigate against duplicate reminders from being sent if the Dev Platform is having issues
+
 ## v1.2.4
 
 * Improve reliability of reminders

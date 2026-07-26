@@ -69,7 +69,7 @@ export async function queueAdhocTask () {
     await scheduler.runJob({
         name: SchedulerJob.SendReminderJob,
         runAt: nextReminderDue.toJSDate(),
-        data: { type: "adhoc" },
+        data: { type: "adhoc", jobGuid: crypto.randomUUID() },
     });
 
     console.log(`Queue Adhoc Job: Job scheduled for ${formatDateForLogs(nextReminderDue)}`);

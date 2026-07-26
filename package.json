@@ -15,9 +15,9 @@
     "type-check": "tsc --build"
   },
   "dependencies": {
-    "@devvit/start": "0.13.3",
-    "@devvit/shared-types": "0.13.3",
-    "@devvit/web": "0.13.3",
+    "@devvit/start": "0.13.9",
+    "@devvit/shared-types": "0.13.9",
+    "@devvit/web": "0.13.9",
     "@fsvreddit/fsv-devvit-web-helpers": "github:fsvreddit/fsv-devvit-web-helpers",
     "@hono/node-server": "^2.0.0",
     "cron-parser": "^5.5.0",
@@ -32,7 +32,7 @@
     "@types/json2md": "^1.5.4",
     "@types/luxon": "^3.7.1",
     "@types/pluralize": "^0.0.33",
-    "devvit": "0.13.3",
+    "devvit": "0.13.9",
     "eslint": "^10.0.0",
     "typescript": "5.8.3",
     "vitest": "^4.0.14"
