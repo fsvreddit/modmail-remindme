@@ -1,9 +1,9 @@
-import { DateTime } from "luxon";
+import { format } from "date-fns";
 
-export function formatDateForLogs (dt: DateTime): string {
-    return dt.toFormat("yyyy-MM-dd HH:mm:ss");
+export function formatDateForLogs (dt: Date): string {
+    return format(dt, "yyyy-MM-dd HH:mm:ss");
 }
 
-export function formatDateForModmail (dt: DateTime): string {
-    return dt.toFormat("EEEE, MMM d, yyyy 'at' HH:mm 'UTC'");
+export function formatDateForModmail (dt: Date): string {
+    return format(dt, "EEEE, MMM d, yyyy 'at' HH:mm 'UTC'");
 }

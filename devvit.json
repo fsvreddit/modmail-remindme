@@ -13,7 +13,10 @@
         "tasks": {
             "sendReminderJob": {
                 "endpoint": "/internal/tasks/send-reminder-job",
-                "cron": "0 1 * * *"
+                "cron": "0 1 * * *",
+                "data": {
+                    "type": "cron"
+                }
             }
         }
     },

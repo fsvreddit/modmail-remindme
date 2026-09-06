@@ -1,9 +1,10 @@
 import { reddit, redis, ScheduledJob, scheduler, settings } from "@devvit/web/server";
-import { DateTime } from "luxon";
+import { addSeconds, subSeconds } from "date-fns";
 import pluralize from "pluralize";
 import json2md from "json2md";
 import { AppSetting, formatDateForLogs, SchedulerJob, SEND_REMINDER_CRON } from ".";
 import { CronExpressionParser } from "cron-parser";
+import { SendReminderJobData } from "../tasks/sendReminderJob";
 
 const REMINDER_QUEUE = "reminderQueue";
 const REMINDER_USERNAMES = "reminderUsernames";
@@ -12,8 +13,8 @@ export async function getReminderQueueSize (): Promise<number> {
     return redis.zCard(REMINDER_QUEUE);
 }
 
-export async function queueReminder (conversationId: string, username: string | undefined, reminderDate: DateTime) {
-    await redis.zAdd(REMINDER_QUEUE, { member: conversationId, score: reminderDate.toMillis() });
+export async function queueReminder (conversationId: string, username: string | undefined, reminderDate: Date) {
+    await redis.zAdd(REMINDER_QUEUE, { member: conversationId, score: reminderDate.getTime() });
     if (username) {
         await redis.hSet(REMINDER_USERNAMES, { [conversationId]: username });
     }
@@ -27,10 +28,10 @@ export async function cancelReminder (conversationId: string): Promise<boolean> 
     return recordsRemoved > 0;
 }
 
-export async function getConversationReminderDate (conversationId: string): Promise<DateTime | undefined> {
+export async function getConversationReminderDate (conversationId: string): Promise<Date | undefined> {
     const score = await redis.zScore(REMINDER_QUEUE, conversationId);
     if (score) {
-        return DateTime.fromMillis(score);
+        return new Date(score);
     }
 }
 
@@ -42,14 +43,14 @@ export async function queueAdhocTask () {
         return;
     }
 
-    let nextReminderDue = DateTime.fromMillis(firstReminder.score).plus({ seconds: 5 });
-    if (nextReminderDue < DateTime.now()) {
-        nextReminderDue = DateTime.now();
+    let nextReminderDue = addSeconds(new Date(firstReminder.score), 5);
+    if (nextReminderDue < new Date()) {
+        nextReminderDue = new Date();
     }
 
-    const nextScheduledJob = DateTime.fromJSDate(CronExpressionParser.parse(SEND_REMINDER_CRON).next().toDate());
+    const nextScheduledJob = CronExpressionParser.parse(SEND_REMINDER_CRON).next().toDate();
 
-    if (nextReminderDue > nextScheduledJob.minus({ seconds: 30 })) {
+    if (nextReminderDue > subSeconds(nextScheduledJob, 30)) {
         console.log(`Queue Adhoc Job: Next scheduled run (${formatDateForLogs(nextScheduledJob)}) is due too soon before the next reminder (${formatDateForLogs(nextReminderDue)})`);
         return;
     }
@@ -66,18 +67,18 @@ export async function queueAdhocTask () {
         await Promise.all(adhocJobs.map(job => scheduler.cancelJob(job.id)));
     }
 
-    await scheduler.runJob({
+    await scheduler.runJob<SendReminderJobData>({
         name: SchedulerJob.SendReminderJob,
-        runAt: nextReminderDue.toJSDate(),
+        runAt: nextReminderDue,
         data: { type: "adhoc", jobGuid: crypto.randomUUID() },
     });
 
     console.log(`Queue Adhoc Job: Job scheduled for ${formatDateForLogs(nextReminderDue)}`);
 }
 
-export async function sendReminders () {
+export async function sendReminders (type?: "adhoc" | "cron") {
     const remindersDue = await redis.zRange(REMINDER_QUEUE, 0, new Date().getTime(), { by: "score" });
-    console.log(`Send Reminders: ${remindersDue.length} ${pluralize("reminder", remindersDue.length)} due`);
+    console.log(`Send Reminders: ${remindersDue.length} ${pluralize("reminder", remindersDue.length)} due, job type: ${type}`);
 
     for (const reminder of remindersDue) {
         const conversationId = reminder.member;

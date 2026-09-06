@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.2.5
+
+* Mitigate against duplicate reminders from being sent if the Dev Platform is having issues
+
+## v1.2.4
+
+* Improve reliability of reminders
+* Archive replies to !RemindMe commands if the mod archives the conversation immediately after issuing one
+
 ## v1.2.3
 
 * Fixed an issue introduced in v1.2.2 which could cause reminders not to send at the right time, and app response messages not to be sent.

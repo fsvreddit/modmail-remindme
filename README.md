@@ -7,8 +7,10 @@ In modmail, use the command `RemindMe!`, `!remind` or `!remindme`, with the peri
 * `RemindMe! 1 day`
 * `RemindMe! 2 weeks`
 * `RemindMe! 6 months`
+* `RemindMe! 2w`
+* `!remind 1y`
 
-Intervals supported are `minute`, `hour`, `day`, `week`, `month` and `year`. If you don't specify an interval, then the app assumes days. E.g. `RemindMe! 4` will set a reminder for four days from the time the command is issued.
+Intervals supported are `minute`, `hour`, `day`, `week`, `month` and `year`. If you don't specify an interval, then the app assumes days. E.g. `RemindMe! 4` will set a reminder for four days from the time the command is issued. All units apart from `minute` can be shortened to a single letter with no space needed, and if no unit is specified, days are assumed.
 
 If an existing reminder for the modmail thread already exists, it will be replaced with the new one.
 
@@ -26,14 +28,9 @@ Use the same command with "cancel" after e.g. `RemindMe! cancel`. Again, the app
 
 For older changes, please see the [full changelog](https://github.com/fsvreddit/modmail-remindme/blob/main/changelog.md)
 
-## v1.2.5
+## v1.3.0
 
-* Mitigate against duplicate reminders from being sent if the Dev Platform is having issues
-
-## v1.2.4
-
-* Improve reliability of reminders
-* Archive replies to !RemindMe commands if the mod archives the conversation immediately after issuing one
+* Add ability to abbreviate time units e.g. `RemindMe! 1w` is the same as writing `RemindMe! 1 week`.
 
 ## About this app
 

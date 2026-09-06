@@ -1,5 +1,5 @@
 import { parseCancellation, parseCommandDate } from "./commandParser.js";
-import { expect, test } from "vitest";
+import { assert, expect, test } from "vitest";
 
 test("parseCancellation", () => {
     const testCases = [
@@ -24,18 +24,26 @@ test("parseCommandDate", () => {
     const testCases = [
         { input: "!remindme 5 minutes", expected: "2023-10-01T12:05:00.000Z" },
         { input: "!RemindMe 2 hours", expected: "2023-10-01T14:00:00.000Z" },
+        { input: "!RemindMe 2h", expected: "2023-10-01T14:00:00.000Z" },
         { input: "!remind 1 day", expected: "2023-10-02T12:00:00.000Z" },
         { input: "!Remind 3 weeks", expected: "2023-10-22T12:00:00.000Z" },
-        { input: "!remindme 4 months", expected: "2024-02-01T12:00:00.000Z" },
+        { input: "!Remind 3w", expected: "2023-10-22T12:00:00.000Z" },
+        { input: "!remindme 4 months", expected: "2024-02-01T13:00:00.000Z" },
+        { input: "!remindme 4m", expected: "2024-02-01T13:00:00.000Z" },
         { input: "!RemindMe 1 year", expected: "2024-10-01T12:00:00.000Z" },
+        { input: "!RemindMe 1y", expected: "2024-10-01T12:00:00.000Z" },
         { input: "!remindme 5 days", expected: "2023-10-06T12:00:00.000Z" },
+        { input: "!remindme 5d", expected: "2023-10-06T12:00:00.000Z" },
     ];
 
     const baselineDate = new Date("2023-10-01T12:00:00.000Z");
 
     testCases.forEach(({ input, expected }) => {
         const result = parseCommandDate(input, baselineDate);
-        expect(result?.setZone("UTC").toISO({ includeOffset: true })).toBe(expected);
+        if (!result) {
+            assert.fail(`Expected a valid date, but got undefined for ${input}.`);
+        }
+        expect(result.toISOString()).toBe(expected);
     });
 });
 
